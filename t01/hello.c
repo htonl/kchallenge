@@ -8,8 +8,8 @@
 
 int init_module(void)
 {
-	printk(KERN_ALERT "Hello World!\n");
-	return 0;
+    printk(KERN_ALERT "Hello World!\n");
+    return 0;
 }
 
 void cleanup_module(void)
