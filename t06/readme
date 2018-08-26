@@ -1,0 +1,5 @@
+insert the module, then run load
+
+run unload to cleanup
+
+used tmp as a file to dd to so I could demo it
