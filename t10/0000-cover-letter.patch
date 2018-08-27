@@ -1,0 +1,20 @@
+From 48d35c2e05bd83742896dfd7496494b7238b0278 Mon Sep 17 00:00:00 2001
+From: Luke Cesarz <lucesarz@gmail.com>
+Date: Sun, 26 Aug 2018 22:14:45 -0500
+Subject: [PATCH 0/1] Fixed style issues with staging/pi443
+
+Hello,
+
+This is my first contribution to the kernel. I am working through the eudyptula
+challenge. Hope these style changes help.
+
+Luke Cesarz (1):
+  Fixed style issues with rf69.c & pi443_if.c
+
+ drivers/staging/pi433/pi433_if.c | 22 ++++----
+ drivers/staging/pi433/rf69.c     | 86 +++++++++++++++++++-------------
+ 2 files changed, 64 insertions(+), 44 deletions(-)
+
+-- 
+2.17.1
+

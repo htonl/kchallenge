@@ -1,0 +1,256 @@
+From 48d35c2e05bd83742896dfd7496494b7238b0278 Mon Sep 17 00:00:00 2001
+From: Luke Cesarz <lucesarz@gmail.com>
+Date: Sun, 26 Aug 2018 20:55:04 -0500
+Subject: [PATCH 1/1] Fixed style issues with rf69.c & pi443_if.c
+
+  * Lines over 80 characters
+---
+ drivers/staging/pi433/pi433_if.c | 22 ++++----
+ drivers/staging/pi433/rf69.c     | 86 +++++++++++++++++++-------------
+ 2 files changed, 64 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/staging/pi433/pi433_if.c b/drivers/staging/pi433/pi433_if.c
+index c85a805a1243..819f7c896897 100644
+--- a/drivers/staging/pi433/pi433_if.c
++++ b/drivers/staging/pi433/pi433_if.c
+@@ -55,7 +55,7 @@
+ #include "pi433_if.h"
+ #include "rf69.h"
+ 
+-#define N_PI433_MINORS			BIT(MINORBITS) /*32*/	/* ... up to 256 */
++#define N_PI433_MINORS		BIT(MINORBITS) /*32*/	/* ... up to 256 */
+ #define MAX_MSG_SIZE			900	/* min: FIFO_SIZE! */
+ #define MSG_FIFO_SIZE			65536   /* 65536 = 2^16  */
+ #define NUM_DIO				2
+@@ -454,7 +454,7 @@ pi433_receive(void *data)
+ 		dev_dbg(dev->dev, "rx: going to wait for high RSSI level");
+ 		retval = wait_event_interruptible(dev->rx_wait_queue,
+ 						  rf69_get_flag(dev->spi,
+-								rssi_exceeded_threshold));
++						  rssi_exceeded_threshold));
+ 		if (retval) /* wait was interrupted */
+ 			goto abort;
+ 		dev->interrupt_rx_allowed = false;
+@@ -489,7 +489,7 @@ pi433_receive(void *data)
+ 	/* length byte enabled? */
+ 	if (dev->rx_cfg.enable_length_byte == OPTION_ON) {
+ 		retval = wait_event_interruptible(dev->fifo_wait_queue,
+-						  dev->free_in_fifo < FIFO_SIZE);
++						dev->free_in_fifo < FIFO_SIZE);
+ 		if (retval) /* wait was interrupted */
+ 			goto abort;
+ 
+@@ -510,7 +510,7 @@ pi433_receive(void *data)
+ 		bytes_total--;
+ 
+ 		retval = wait_event_interruptible(dev->fifo_wait_queue,
+-						  dev->free_in_fifo < FIFO_SIZE);
++						dev->free_in_fifo < FIFO_SIZE);
+ 		if (retval) /* wait was interrupted */
+ 			goto abort;
+ 
+@@ -523,7 +523,7 @@ pi433_receive(void *data)
+ 	while (dev->rx_position < bytes_total) {
+ 		if (!rf69_get_flag(dev->spi, payload_ready)) {
+ 			retval = wait_event_interruptible(dev->fifo_wait_queue,
+-							  dev->free_in_fifo < FIFO_SIZE);
++						dev->free_in_fifo < FIFO_SIZE);
+ 			if (retval) /* wait was interrupted */
+ 				goto abort;
+ 		}
+@@ -679,7 +679,8 @@ pi433_tx_thread(void *data)
+ 		if (retval < 0)
+ 			return retval;
+ 		if (tx_cfg.enable_length_byte == OPTION_ON) {
+-			retval = rf69_set_payload_length(spi, size * tx_cfg.repetitions);
++			retval = rf69_set_payload_length(spi,
++						size * tx_cfg.repetitions);
+ 			if (retval < 0)
+ 				return retval;
+ 		} else {
+@@ -706,7 +707,8 @@ pi433_tx_thread(void *data)
+ 			return retval;
+ 		device->irq_state[DIO0] = DIO_PACKET_SENT;
+ 		irq_set_irq_type(device->irq_num[DIO0], IRQ_TYPE_EDGE_RISING);
+-		enable_irq(device->irq_num[DIO0]); /* was disabled by rx active check */
++		/* was disabled by rx active check */
++		enable_irq(device->irq_num[DIO0]);
+ 
+ 		/* enable transmission */
+ 		retval = rf69_set_mode(spi, transmit);
+@@ -736,9 +738,9 @@ pi433_tx_thread(void *data)
+ 						(size - position));
+ 				position = 0; /* reset for next repetition */
+ 			}
+-
+-			retval = wait_event_interruptible(device->fifo_wait_queue,
+-							  device->free_in_fifo > 0);
++			retval = wait_event_interruptible
++				(device->fifo_wait_queue,
++				 device->free_in_fifo > 0);
+ 			if (retval) {
+ 				dev_dbg(device->dev, "ABORT\n");
+ 				goto abort;
+diff --git a/drivers/staging/pi433/rf69.c b/drivers/staging/pi433/rf69.c
+index 085272fb393f..2cb4e74cbddf 100644
+--- a/drivers/staging/pi433/rf69.c
++++ b/drivers/staging/pi433/rf69.c
+@@ -186,20 +186,20 @@ int rf69_set_modulation_shaping(struct spi_device *spi,
+ 		switch (mod_shaping) {
+ 		case SHAPING_OFF:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_NONE);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_NONE);
+ 		case SHAPING_1_0:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_1_0);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_1_0);
+ 		case SHAPING_0_5:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_0_5);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_0_5);
+ 		case SHAPING_0_3:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_0_3);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_0_3);
+ 		default:
+ 			dev_dbg(&spi->dev, "set: illegal input param");
+ 			return -EINVAL;
+@@ -208,16 +208,16 @@ int rf69_set_modulation_shaping(struct spi_device *spi,
+ 		switch (mod_shaping) {
+ 		case SHAPING_OFF:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_NONE);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_NONE);
+ 		case SHAPING_BR:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_BR);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_BR);
+ 		case SHAPING_2BR:
+ 			return rf69_read_mod_write(spi, REG_DATAMODUL,
+-						   MASK_DATAMODUL_MODULATION_SHAPE,
+-						   DATAMODUL_MODULATION_SHAPE_2BR);
++					MASK_DATAMODUL_MODULATION_SHAPE,
++					DATAMODUL_MODULATION_SHAPE_2BR);
+ 		default:
+ 			dev_dbg(&spi->dev, "set: illegal input param");
+ 			return -EINVAL;
+@@ -573,41 +573,58 @@ bool rf69_get_flag(struct spi_device *spi, enum flag flag)
+ {
+ 	switch (flag) {
+ 	case mode_switch_completed:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_MODE_READY);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_MODE_READY);
+ 	case ready_to_receive:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_RX_READY);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_RX_READY);
+ 	case ready_to_send:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_TX_READY);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_TX_READY);
+ 	case pll_locked:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_PLL_LOCK);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_PLL_LOCK);
+ 	case rssi_exceeded_threshold:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_RSSI);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_RSSI);
+ 	case timeout:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_TIMEOUT);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_TIMEOUT);
+ 	case automode:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_AUTOMODE);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_AUTOMODE);
+ 	case sync_address_match:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS1) & MASK_IRQFLAGS1_SYNC_ADDRESS_MATCH);
++		return (rf69_read_reg(spi, REG_IRQFLAGS1) &
++				MASK_IRQFLAGS1_SYNC_ADDRESS_MATCH);
+ 	case fifo_full:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_FIFO_FULL);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_FIFO_FULL);
+ /*
+  *	case fifo_not_empty:
+- *		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_FIFO_NOT_EMPTY);
++ *		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++ *		MASK_IRQFLAGS2_FIFO_NOT_EMPTY);
+  */
+ 	case fifo_empty:
+-		return !(rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_FIFO_NOT_EMPTY);
++		return !(rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_FIFO_NOT_EMPTY);
+ 	case fifo_level_below_threshold:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_FIFO_LEVEL);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_FIFO_LEVEL);
+ 	case fifo_overrun:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_FIFO_OVERRUN);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_FIFO_OVERRUN);
+ 	case packet_sent:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_PACKET_SENT);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_PACKET_SENT);
+ 	case payload_ready:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_PAYLOAD_READY);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_PAYLOAD_READY);
+ 	case crc_ok:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_CRC_OK);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_CRC_OK);
+ 	case battery_low:
+-		return (rf69_read_reg(spi, REG_IRQFLAGS2) & MASK_IRQFLAGS2_LOW_BAT);
++		return (rf69_read_reg(spi, REG_IRQFLAGS2) &
++				MASK_IRQFLAGS2_LOW_BAT);
+ 	default:			 return false;
+ 	}
+ }
+@@ -718,7 +735,8 @@ int rf69_enable_crc(struct spi_device *spi)
+ 
+ int rf69_disable_crc(struct spi_device *spi)
+ {
+-	return rf69_clear_bit(spi, REG_PACKETCONFIG1, MASK_PACKETCONFIG1_CRC_ON);
++	return rf69_clear_bit(spi, REG_PACKETCONFIG1,
++			MASK_PACKETCONFIG1_CRC_ON);
+ }
+ 
+ int rf69_set_address_filtering(struct spi_device *spi,
+@@ -825,7 +843,7 @@ int rf69_read_fifo(struct spi_device *spi, u8 *buffer, unsigned int size)
+ 
+ 	if (size > FIFO_SIZE) {
+ 		dev_dbg(&spi->dev,
+-			"read fifo: passed in buffer bigger then internal buffer\n");
++		"read fifo: passed in buffer bigger than internal buffer\n");
+ 		return -EMSGSIZE;
+ 	}
+ 
+@@ -858,7 +876,7 @@ int rf69_write_fifo(struct spi_device *spi, u8 *buffer, unsigned int size)
+ 
+ 	if (size > FIFO_SIZE) {
+ 		dev_dbg(&spi->dev,
+-			"read fifo: passed in buffer bigger then internal buffer\n");
++		"read fifo: passed in buffer bigger than internal buffer\n");
+ 		return -EMSGSIZE;
+ 	}
+ 
+-- 
+2.17.1
+
