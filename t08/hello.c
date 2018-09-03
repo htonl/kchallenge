@@ -1,5 +1,5 @@
 /*
- * hello world module.  *
+ * hello world module.
  * Copyright (C) 2018 lcesarz
  */
 #include <linux/module.h>
@@ -22,7 +22,7 @@ struct dentry *id_d;
 struct dentry *jiffies_d;
 struct dentry *eudy_d;
 struct dentry *foo_d;
-static char foo_buf[PAGE_SIZE];
+static char *foo_buf;
 static int foo_len;
 
 
@@ -127,6 +127,10 @@ int init_module(void)
 	    return -ENOMEM;
 	pr_debug("created debugfs file%s\n",fooname);
 
+	foo_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
+	if(!foo_buf)
+	    return -ENOMEM;
+
 	return 0;
 }
 
@@ -137,6 +141,7 @@ void cleanup_module(void)
 	debugfs_remove(jiffies_d);
 	debugfs_remove(foo_d);
 	debugfs_remove(eudy_d);
+	kfree(foo_buf);
 }
 
 MODULE_LICENSE("GPL");
